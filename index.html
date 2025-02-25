@@ -21,7 +21,7 @@
                     <img src="./images/bookeeplogo.png" alt="Bookeep Logo" width="42" height="52" class="d-inline-block">
                     <h1 class="mb-0 ms-2">ookeep</h1>
                 </a>
-                <button type="button" class="btn btn-light">Add Book</button>
+                <a href="add-book.html" class="btn btn-light">Add Book</a>
             </div>
         </nav>
     </header>
@@ -33,52 +33,48 @@
         <div id="book-list" class="container mt-3"></div>
 
         <script>
-            fetch('books.json')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("Network response was not ok");
-                    }
-                    return response.json();
-                })
-                .then(books => {
-                    let bookListContainer = document.getElementById("book-list");
+            // Load books from local storage
+            const loadBooksFromLocalStorage = () => {
+                const books = JSON.parse(localStorage.getItem('books')) || [];
+                return books;
+            };
 
-                    if (books.length === 0) {
-                        bookListContainer.innerHTML = `<p class="text-center">No Books Reported</p>`;
-                        return;
-                    }
+            // Render books
+            const renderBooks = () => {
+                const books = loadBooksFromLocalStorage();
+                const bookListContainer = document.getElementById('book-list');
+                if (books.length === 0) {
+                    bookListContainer.innerHTML = `<p class="text-center">No Books Reported</p>`;
+                    return;
+                }
 
-                    let htmlContent = "";
+                let htmlContent = '';
+                for (let i = 0; i < books.length; i++) {
+                    let bookImage = books[i].picFile ? books[i].picFile : 'https://via.placeholder.com/150';
 
-                    for (let i = 0; i < books.length; i++) {
-                        let bookImage = books[i].picFile ? books[i].picFile : 'https://via.placeholder.com/150';
-                        
-                        htmlContent += `
-                            <div class="accordion" id="accordion${i}">
-                                <div class="accordion-item">
-                                    <h2 class="accordion-header">
-                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#book${i}" aria-expanded="false" aria-controls="book${i}">
-                                            ${books[i].name}
-                                        </button>
-                                    </h2>
-                                    <div id="book${i}" class="accordion-collapse collapse" data-bs-parent="#accordion${i}">
-                                        <div class="accordion-body">
-                                            <img src="${bookImage}" alt="${books[i].name}" style="width:150px; height:200px;" class="mb-3">
-                                            <p><strong>Review:</strong> ${books[i].review}</p>
-                                            <a href="detail.html?id=${i}" class="btn btn-primary">Learn More</a>
-                                        </div>
+                    htmlContent += `
+                        <div class="accordion" id="accordion${i}">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#book${i}" aria-expanded="false" aria-controls="book${i}">
+                                        ${books[i].name}
+                                    </button>
+                                </h2>
+                                <div id="book${i}" class="accordion-collapse collapse" data-bs-parent="#accordion${i}">
+                                    <div class="accordion-body">
+                                        <img src="${bookImage}" alt="${books[i].name}" style="width:150px; height:200px;" class="mb-3">
+                                        <p><strong>Review:</strong> ${books[i].review}</p>
                                     </div>
                                 </div>
                             </div>
-                        `;
-                    }
+                        </div>
+                    `;
+                }
+                bookListContainer.innerHTML = htmlContent;
+            };
 
-                    bookListContainer.innerHTML = htmlContent;
-                })
-                .catch(error => {
-                    console.error("Error loading books.json:", error);
-                    document.getElementById("book-list").innerHTML = `<p class="text-center">Failed to load books.</p>`;
-                });
+            // Initial render
+            renderBooks();
         </script>
     </article>
 
