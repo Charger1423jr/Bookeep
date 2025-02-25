@@ -33,13 +33,11 @@
         <div id="book-list" class="container mt-3"></div>
 
         <script>
-            // Load books from local storage
             const loadBooksFromLocalStorage = () => {
                 const books = JSON.parse(localStorage.getItem('books')) || [];
                 return books;
             };
 
-            // Render books
             const renderBooks = () => {
                 const books = loadBooksFromLocalStorage();
                 const bookListContainer = document.getElementById('book-list');
@@ -73,7 +71,6 @@
                 bookListContainer.innerHTML = htmlContent;
             };
 
-            // Initial render
             renderBooks();
         </script>
     </article>
