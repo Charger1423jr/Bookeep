@@ -88,7 +88,14 @@ function addBook() {
 
 function renderBooks() {
     const searchTerm = document.getElementById('searchBox').value.toLowerCase();
-    const filteredBooks = books.filter(book => 
+
+    const sortedBooks = [...books].sort((a, b) => {
+        const dateA = new Date(a.dateRead);
+        const dateB = new Date(b.dateRead);
+        return dateB - dateA; // newest first
+    });
+
+    const filteredBooks = sortedBooks.filter(book =>
         book.title.toLowerCase().includes(searchTerm)
     );
 
@@ -114,6 +121,7 @@ function renderBooks() {
         bookList.appendChild(bookDiv);
     });
 }
+
 
 function renderBookView(book) {
     return `
