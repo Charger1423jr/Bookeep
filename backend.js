@@ -92,7 +92,7 @@ function renderBooks() {
     const sortedBooks = [...books].sort((a, b) => {
         const dateA = new Date(a.dateRead);
         const dateB = new Date(b.dateRead);
-        return dateB - dateA; // newest first
+        return dateB - dateA;
     });
 
     const filteredBooks = sortedBooks.filter(book =>
@@ -131,8 +131,8 @@ function renderBookView(book) {
                 <div class="book-details">Words: ${formatNumber(book.wordCount)} • Date: ${book.dateRead}</div>
             </div>
             <div class="book-actions">
-                <button class="btn btn-sm btn-warning" onclick="startEdit('${book.id}')">✏️ Edit</button>
-                <button class="btn btn-sm btn-danger" onclick="showDeleteModal('${book.id}')">🗑️ Delete</button>
+                <button class="btn btn-sm btn-warning" onclick="startEdit('${book.id}')">Edit</button>
+                <button class="btn btn-sm btn-danger" onclick="showDeleteModal('${book.id}')">Delete</button>
             </div>
         </div>
     `;
@@ -344,4 +344,84 @@ function showSnackbar(message) {
     
     const toast = new bootstrap.Toast(snackbarEl);
     toast.show();
+}
+
+function exportData() {
+    if (books.length === 0) {
+        showSnackbar('No data to export!');
+        return;
+    }
+
+    const dataStr = JSON.stringify(books, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `bookeep-data-${new Date().toISOString().split('T')[0]}.json`;
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    URL.revokeObjectURL(url);
+    showSnackbar('Data exported successfully!');
+}
+
+function importData(event) {
+    const file = event.target.files[0];
+    if (!file) {
+        return;
+    }
+
+    if (file.type !== 'application/json') {
+        showSnackbar('Please select a valid JSON file!');
+        event.target.value = '';
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const importedData = JSON.parse(e.target.result);
+            
+            if (!Array.isArray(importedData)) {
+                showSnackbar('Invalid data format!');
+                return;
+            }
+
+            const isValid = importedData.every(book => 
+                book.hasOwnProperty('id') &&
+                book.hasOwnProperty('title') &&
+                book.hasOwnProperty('wordCount') &&
+                book.hasOwnProperty('dateRead')
+            );
+
+            if (!isValid) {
+                showSnackbar('Invalid book data format!');
+                return;
+            }
+
+            const confirmReplace = confirm(
+                `This will replace your current ${books.length} book(s) with ${importedData.length} book(s) from the file. Continue?`
+            );
+
+            if (confirmReplace) {
+                books = importedData;
+                saveBooks();
+                renderBooks();
+                updateStats();
+                showSnackbar(`Successfully imported ${importedData.length} book(s)!`);
+            }
+        } catch (error) {
+            showSnackbar('Error reading file: ' + error.message);
+        }
+    };
+
+    reader.onerror = function() {
+        showSnackbar('Error reading file!');
+    };
+
+    reader.readAsText(file);
+    event.target.value = '';
 }
