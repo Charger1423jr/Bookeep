@@ -16,9 +16,18 @@
                     <img src="./images/bookeeplogo.png" alt="Bookeep Logo" width="42" height="52" class="d-inline-block">
                     <h1 class="mb-0 ms-2">ookeep</h1>
                 </a>
-                <button class="btn btn-warning" onclick="showWrapped()">
-                    ✨ My <span id="currentYear"></span> Wrapped
-                </button>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-success" onclick="exportData()">
+                        Export Data
+                    </button>
+                    <button class="btn btn-info" onclick="document.getElementById('importFile').click()">
+                        Import Data
+                    </button>
+                    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+                    <button class="btn btn-warning" onclick="showWrapped()">
+                        ✨ My <span id="currentYear"></span> Wrapped
+                    </button>
+                </div>
             </div>
         </nav>
     </header>
@@ -86,7 +95,7 @@
         <h2 class="text-center mb-3">Your Library</h2>
 
         <div class="mb-3">
-            <input type="text" class="form-control search-box" id="searchBox" placeholder="🔍 Search books" oninput="filterBooks()">
+            <input type="text" class="form-control search-box" id="searchBox" placeholder="Search books" oninput="filterBooks()">
         </div>
 
         <div id="bookList" class="mb-5"></div>
